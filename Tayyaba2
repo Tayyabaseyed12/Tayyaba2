@@ -1,0 +1,31 @@
+import json
+import hashlib
+
+class URLShortener:
+	def __init__(self, storage_file='url_mappings.json'):
+    	self.storage_file = storage_file
+    	try:
+        	with open(self.storage_file, 'r') as file:
+            	self.url_mappings = json.load(file)
+    	except FileNotFoundError:
+        	self.url_mappings = {}
+
+	def save_mappings(self):
+    	with open(self.storage_file, 'w') as file:
+        	json.dump(self.url_mappings, file)
+
+	def generate_short_url(self, long_url):
+    	short_url = hashlib.md5(long_url.encode()).hexdigest()[:6]
+    	self.url_mappings[short_url] = long_url
+    	self.save_mappings()
+    	return short_url
+
+	def get_long_url(self, short_url):
+    	return self.url_mappings.get(short_url, None)
+
+# Example usage
+if __name__ == "__main__":
+	url_shortener = URLShortener()
+	long_url = input("Enter the long URL: ")
+	short_url = url_shortener.generate_short_url(long_url)
+	print(f"Short URL: {short_url}")
